@@ -12,19 +12,11 @@ describe Round do
     end
 
     describe "deal_hands" do
-        it "puts two cards in each hand" do
+        it "create a hand for each player" do
             round = Round.new(@players, @deck)
-            round.deal_hands
-            for hand in round.hands do
-                expect(hand.cards.length).to eq 2
-            end
-        end
-
-        it "calls deck.deal_card twice for each player" do
-            expect(@deck).to receive(:deal_card).exactly(@players.length * 2).times
-
-            round = Round.new(@players, @deck)
-            round.deal_hands
+            hand_class = double(:hand_class, {new: double(:hand)})
+            round.deal_hands(hand_class)
+            expect(round.hands.length).to eq @players.length
         end
     end
 

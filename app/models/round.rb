@@ -11,11 +11,9 @@ class Round
         @community_cards = []
     end
 
-    def deal_hands
+    def deal_hands(hand_class = Hand)
         for player in @players do
-            cards = []
-            2.times { cards.push(@deck.deal_card) }
-            @hands.push(Hand.new(cards, player))
+            @hands.push(hand_class.new(player, @deck))
         end
     end
 
@@ -30,7 +28,7 @@ class Round
     def get_winner
         winning_hand = @hands.first
         for hand in @hands do
-            if hand.score > winning_hand.score
+            if hand.score(community_cards) > winning_hand.score(community_cards)
                 winning_hand = hand
             end
         end
