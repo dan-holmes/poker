@@ -9,6 +9,10 @@ class Deck
         @cards.shuffle!
     end
 
+    def deal_card
+        @cards.pop
+    end
+
     def generate_cards
         cards = []
         for suit in ['hearts', 'diamonds', 'spades', 'clubs'] do
