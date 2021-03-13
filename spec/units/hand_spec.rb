@@ -7,4 +7,7 @@ describe Hand do
         expect(@hand.cards[0]).to be_a Card
         expect(@hand.cards[1]).to be_a Card
     end
+    it "is assigned to a player" do
+        expect(@hand.player).to be_a Player
+    end
 end
