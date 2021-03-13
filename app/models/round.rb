@@ -19,7 +19,11 @@ class Round
         end
     end
 
+    def deal_community
+        @community_cards.push(@deck.deal_card)
+    end
+
     def deal_flop
-        3.times { @community_cards.push(@deck.deal_card) }
+        3.times { deal_community }
     end
 end
