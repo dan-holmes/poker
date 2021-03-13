@@ -1,7 +1,7 @@
 describe Round do
     before(:each) do
         @players = [double(:player), double(:player), double(:player), double(:player)]
-        @deck = double(:deck, {reset: nil, shuffle: nil})
+        @deck = double(:deck, {reset: nil, shuffle: nil, deal_card: double(:card)})
     end
     describe "initialize" do
         it "resets deck and shuffles it" do
@@ -20,17 +20,21 @@ describe Round do
             end
         end
 
-        it "deals unique cards to each player" do
+        it "calls deck.deal_card twice for each player" do
+            expect(@deck).to receive(:deal_card).exactly(@players.length * 2).times
+
             round = Round.new(@players, @deck)
             round.deal_hands
-
-            dealt_cards = []
-
-            for hand in round.hands do
-                dealt_cards.concat(hand.cards)
-            end
-
-            expect(dealt_cards.uniq).to eq dealt_cards
         end
     end
+
+    # describe "deal_flop" do
+    #     it "adds three unique cards to the community cards" do
+    #         round = Round.new(@players, @deck)
+    #         round.deal_flop
+
+    #         expect(round.community_cards.length).to eq 3
+    #         expect(round.community_cards.uniq).to eq round.community_cards
+    #     end
+    # end
 end
