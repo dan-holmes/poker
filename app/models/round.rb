@@ -1,5 +1,5 @@
 class Round
-    attr_reader :hands, :pot
+    attr_reader :hands, :pot, :community_cards
 
     def initialize(players, deck)
         @deck = deck
@@ -20,6 +20,6 @@ class Round
     end
 
     def deal_flop
-
+        3.times { @community_cards.push(@deck.deal_card) }
     end
 end

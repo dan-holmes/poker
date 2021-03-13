@@ -28,13 +28,19 @@ describe Round do
         end
     end
 
-    # describe "deal_flop" do
-    #     it "adds three unique cards to the community cards" do
-    #         round = Round.new(@players, @deck)
-    #         round.deal_flop
+    describe "deal_flop" do
+        it "calls deck.deal_card three times" do
+            expect(@deck).to receive(:deal_card).exactly(3).times
 
-    #         expect(round.community_cards.length).to eq 3
-    #         expect(round.community_cards.uniq).to eq round.community_cards
-    #     end
-    # end
+            round = Round.new(@players, @deck)
+            round.deal_flop
+        end
+
+        it "adds three community cards" do
+            round = Round.new(@players, @deck)
+            round.deal_flop
+
+            expect(round.community_cards.length).to eq 3
+        end
+    end
 end
