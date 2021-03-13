@@ -13,6 +13,10 @@ class Deck
         @cards.pop
     end
 
+    def reset(cards = generate_cards)
+        @cards = cards
+    end
+
     def generate_cards
         cards = []
         for suit in ['hearts', 'diamonds', 'spades', 'clubs'] do
