@@ -1,12 +1,12 @@
 class Round
     attr_reader :hands, :pot, :community_cards
 
-    def initialize(players, deck)
+    def initialize(players, deck, hands = [])
         @deck = deck
         @deck.reset
         @deck.shuffle
         @players = players
-        @hands = []
+        @hands = hands
         @pot = 0
         @community_cards = []
     end
@@ -25,5 +25,15 @@ class Round
 
     def deal_flop
         3.times { deal_community }
+    end
+
+    def get_winner
+        winning_hand = @hands.first
+        for hand in @hands do
+            if hand.score > winning_hand.score
+                winning_hand = hand
+            end
+        end
+        return winning_hand.player
     end
 end

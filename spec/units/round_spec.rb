@@ -57,4 +57,23 @@ describe Round do
             expect(round.community_cards.length).to eq 3
         end
     end
+
+    describe '#get_winner' do
+        it "returns the player with the winning hand" do
+            player1 = double(:player)
+            player2 = double(:player)
+            player3 = double(:player)
+            hand1 = double(:hand, {score: 10, player: player1})
+            hand2 = double(:hand, {score: 20, player: player2})
+            hand3 = double(:hand, {score: 15, player: player3})
+            hands = [hand1, hand2, hand3]
+
+            round = Round.new(@players, @deck, hands)
+            round.deal_flop
+            round.deal_community
+            round.deal_community
+
+            expect(round.get_winner).to eq player2
+        end
+    end
 end
