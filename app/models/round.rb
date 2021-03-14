@@ -39,12 +39,26 @@ class Round
     end
 
     def bet(player, amount)
-        raise "Bet too low." if amount < current_bet
         raise "Play out of turn." if player_to_bet != player
+        if amount == false
+            fold(player)
+        else
+            positive_bet(player, amount)
+        end
+        @turn = @turn % @players.length
+    end
+
+    def fold(player)
+        @folded[player] = true
+        @players.delete(player)
+    end
+
+    def positive_bet(player, amount)
+        raise "Bet too low." if amount < current_bet
         @pot += amount
         @bets[player] = amount
         player.debit(100)
-        @turn = (@turn + 1) % @players.length
+        @turn += 1
     end
 
     def player_to_bet
