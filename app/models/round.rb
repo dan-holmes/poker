@@ -1,5 +1,5 @@
 class Round
-    attr_reader :hands, :pot, :community_cards, :current_bet
+    attr_reader :hands, :pot, :community_cards, :turn, :current_bet
 
     def initialize(players, deck, hands = [])
         @deck = deck
@@ -10,6 +10,7 @@ class Round
         @pot = 0
         @current_bet = 0
         @community_cards = []
+        @turn = 0
     end
 
     def deal_hands(hand_class = Hand)
@@ -37,9 +38,15 @@ class Round
     end
 
     def bet(player, amount)
-        raise "Bet too low." if amount < current_bet
+        raise "Bet too low." if amount < @current_bet
+        raise "Play out of turn." if player_to_bet != player
         @pot += amount
         player.debit(100)
         @current_bet = amount
+        @turn += 1
+    end
+
+    def player_to_bet
+        @players[turn]
     end
 end

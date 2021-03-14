@@ -2,7 +2,8 @@ describe Round do
     before(:each) do
         @player1 = double(:player, debit: nil)
         @player2 = double(:player, debit: nil)
-        @players = [@player1, @player2, double(:player), double(:player)]
+        @player3 = double(:player, debit: nil)
+        @players = [@player1, @player2, @player3, double(:player)]
         @deck = double(:deck, {reset: nil, shuffle: nil, deal_card: double(:card)})
     end
     describe "initialize" do
@@ -90,6 +91,21 @@ describe Round do
             round = Round.new(@players, @deck)
             round.bet(@player1, 100)
             expect{ round.bet(@player2, 50) }.to raise_error "Bet too low."
+        end
+        it "moves onto the next turn" do
+            round = Round.new(@players, @deck)
+            expect{round.bet(@player1, 100)}.to change{ round.turn }.by(1)
+        end
+        it "errors if not your turn" do
+            round = Round.new(@players, @deck)
+            round.bet(@player1, 100)
+            expect{ round.bet(@player1, 100) }.to raise_error "Play out of turn."
+            expect{ round.bet(@player3, 100) }.to raise_error "Play out of turn."
+        end
+        it "allows multiple bets in turn" do
+            round = Round.new(@players, @deck)
+            round.bet(@player1, 100)
+            expect{ round.bet(@player2, 100) }.to_not raise_error
         end
     end
 end
