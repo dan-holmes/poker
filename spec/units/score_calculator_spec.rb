@@ -49,5 +49,12 @@ describe ScoreCalculator do
                 expect(ScoreCalculator.score(cards)).to eq expected_score
             end
         end
+        context " for four of a kind" do
+            it "gives points time 14^11 plus high card as usual" do
+                cards = [Card.new('hearts', 5), Card.new('spades', 10), Card.new('hearts', 10), Card.new('spades', 10), Card.new('hearts', 10)]
+                expected_score = 10*(14**11) + 5*(14**0)
+                expect(ScoreCalculator.score(cards)).to eq expected_score
+            end
+        end
     end
 end

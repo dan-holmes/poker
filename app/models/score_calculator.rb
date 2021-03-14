@@ -1,6 +1,8 @@
 class ScoreCalculator
     def self.score(cards)
-        if self.full_house(cards)
+        if self.four_of_a_kind(cards)
+            return self.four_of_a_kind(cards) * 14**11 + self.score_high_card_values(self.single_cards(cards))
+        elsif self.full_house(cards)
             return self.three_of_a_kind(cards) * 14**10 + self.pair(cards) * 14**9
         elsif self.flush(cards)
             return self.score_high_card_values(self.values(cards)) * 14**(9 - 4)
@@ -65,6 +67,10 @@ class ScoreCalculator
         trips = self.three_of_a_kind(cards)
         pair = self.pair(cards)
         trips && pair ? [trips, pair] : false
+    end
+
+    def self.four_of_a_kind(cards)
+        self.count_of_each_card(cards).select { |value, count| count == 4 }.keys.first
     end
 
     def self.single_cards(cards)
