@@ -35,5 +35,12 @@ describe ScoreCalculator do
                 expect(ScoreCalculator.score(cards)).to eq expected_score
             end
         end
+        context " for a flush" do
+            it " gives points for highest card time 14^9 and each card after that times 14^8 etc" do
+                cards = [Card.new('hearts', 10), Card.new('hearts', 5), Card.new('hearts', 6), Card.new('hearts', 10), Card.new('hearts', 12)]
+                expected_score = 12*(14**9) + 10*(14**8) + 10*(14**7) + 6*(14**6) + 5*(14**5)
+                expect(ScoreCalculator.score(cards)).to eq expected_score
+            end
+        end
     end
 end

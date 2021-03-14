@@ -1,6 +1,8 @@
 class ScoreCalculator
     def self.score(cards)
-        if self.straight(cards)
+        if self.flush(cards)
+            return self.score_high_card_values(self.values(cards)) * 14**(9 - 4)
+        elsif self.straight(cards)
             return self.straight(cards) * 14**8
         elsif self.three_of_a_kind(cards)
             return self.three_of_a_kind(cards) * 14**7 + self.score_high_card_values(self.single_cards(cards))
@@ -51,6 +53,10 @@ class ScoreCalculator
         unique = sorted_values.uniq == sorted_values
         span_five = sorted_values.last - sorted_values.first == 4
         unique && span_five ? sorted_values.last : false
+    end
+
+    def self.flush(cards)
+        cards.map { |card| card.suit }.uniq.length == 1
     end
 
     def self.single_cards(cards)
