@@ -1,9 +1,9 @@
 describe Round do
     before(:each) do
-        @player1 = double(:player, debit: nil)
-        @player2 = double(:player, debit: nil)
-        @player3 = double(:player, debit: nil)
-        @player4 = double(:player, debit: nil)
+        @player1 = double(:player, debit: nil, deposit: nil)
+        @player2 = double(:player, debit: nil, deposit: nil)
+        @player3 = double(:player, debit: nil, deposit: nil)
+        @player4 = double(:player, debit: nil, deposit: nil)
         @players = [@player1, @player2, @player3, @player4]
         @deck = double(:deck, {reset: nil, shuffle: nil, deal_card: double(:card)})
     end
@@ -17,18 +17,16 @@ describe Round do
 
     describe "deal_hands" do
         it "create a hand for each player" do
-            round = Round.new(@players, @deck)
             hand_class = double(:hand_class, {new: double(:hand)})
-            round.deal_hands(hand_class)
+            round = Round.new(@players, @deck, hand_class)
             expect(round.hands.length).to eq @players.length
         end
     end
 
     describe "#deal_community" do
         it "calls deck.deal_card" do
-            expect(@deck).to receive(:deal_card).exactly(1).times
-
             round = Round.new(@players, @deck)
+            expect(@deck).to receive(:deal_card).exactly(1).times
             round.deal_community
         end
 
@@ -40,9 +38,8 @@ describe Round do
 
     describe "#deal_flop" do
         it "calls deck.deal_card three times" do
-            expect(@deck).to receive(:deal_card).exactly(3).times
-
             round = Round.new(@players, @deck)
+            expect(@deck).to receive(:deal_card).exactly(3).times
             round.deal_flop
         end
 
@@ -64,10 +61,12 @@ describe Round do
             hand3 = double(:hand, {score: 15, player: player3})
             hands = [hand1, hand2, hand3]
 
-            round = Round.new(@players, @deck, hands)
+            round = Round.new(@players, @deck)
             round.deal_flop
             round.deal_community
             round.deal_community
+
+            allow(round).to receive(:hands).and_return(hands)
 
             expect(round.get_winner).to eq player2
         end
@@ -174,6 +173,13 @@ describe Round do
             expect(round).to receive(:deal_community)
             round.increment_stage
             expect(round).not_to receive(:deal_community)
+            round.increment_stage
+        end
+        it "ends the round on after the last stage" do
+            round = Round.new(@players, @deck)
+            round.increment_stage
+            round.increment_stage
+            round.increment_stage
             expect(round).to receive(:end_round)
             round.increment_stage
         end

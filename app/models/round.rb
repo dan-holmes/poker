@@ -1,21 +1,22 @@
 class Round
-    attr_reader :hands, :pot, :community_cards, :turn, :stage
+    attr_reader :pot, :community_cards, :turn, :stage
 
-    def initialize(players, deck, hands = [])
+    def initialize(players, deck, hand_class = Hand)
         @deck = deck
         @deck.reset
         @deck.shuffle
         @players = players
-        @hands = hands
+        @hands = []
         @pot = 0
         @community_cards = []
         @turn = 0
         @bets = Hash[players.collect { |player| [player, 0] }]
         @folded = Hash[players.collect { |player| [player, false] }]
         @stage = 0
+        deal_hands(hand_class)
     end
 
-    def deal_hands(hand_class = Hand)
+    def deal_hands(hand_class)
         for player in @players do
             @hands.push(hand_class.new(player, @deck))
         end
@@ -30,8 +31,8 @@ class Round
     end
 
     def get_winner
-        winning_hand = @hands.first
-        for hand in @hands do
+        winning_hand = hands.first
+        for hand in hands do
             if hand.score(community_cards) > winning_hand.score(community_cards)
                 winning_hand = hand
             end
@@ -91,5 +92,15 @@ class Round
             end_round
         end
         @stage += 1
+    end
+
+    def end_round
+        winner = get_winner
+        winner.deposit(@pot)
+        return hands.select{ |hand| hand.player == winner }.first
+    end
+
+    def hands
+        @hands
     end
 end
