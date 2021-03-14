@@ -1,6 +1,8 @@
 class ScoreCalculator
     def self.score(cards)
-        if self.flush(cards)
+        if self.full_house(cards)
+            return self.three_of_a_kind(cards) * 14**10 + self.pair(cards) * 14**9
+        elsif self.flush(cards)
             return self.score_high_card_values(self.values(cards)) * 14**(9 - 4)
         elsif self.straight(cards)
             return self.straight(cards) * 14**8
@@ -57,6 +59,12 @@ class ScoreCalculator
 
     def self.flush(cards)
         cards.map { |card| card.suit }.uniq.length == 1
+    end
+
+    def self.full_house(cards)
+        trips = self.three_of_a_kind(cards)
+        pair = self.pair(cards)
+        trips && pair ? [trips, pair] : false
     end
 
     def self.single_cards(cards)

@@ -42,5 +42,12 @@ describe ScoreCalculator do
                 expect(ScoreCalculator.score(cards)).to eq expected_score
             end
         end
+        context " for a full house" do
+            it "gives points times 14^10 for the three and times 14^9 for the two" do
+                cards = [Card.new('hearts', 5), Card.new('spades', 5), Card.new('hearts', 10), Card.new('spades', 10), Card.new('hearts', 5)]
+                expected_score = 5*(14**10) + 10*(14**9)
+                expect(ScoreCalculator.score(cards)).to eq expected_score
+            end
+        end
     end
 end
