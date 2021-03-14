@@ -1,7 +1,7 @@
 class ScoreCalculator
     def self.score(cards)
         if self.pair(cards)
-            return 20 + self.pair(cards) + self.score_high_card_values(self.values(cards[2..-1]))
+            return self.pair(cards) * 14**5 + self.score_high_card_values(self.single_cards(cards))
         else
             return self.score_high_card_values(self.values(cards))
         end
@@ -9,8 +9,8 @@ class ScoreCalculator
 
     def self.score_high_card_values(values)
         values.sort!.reverse!
-        modifier = 14**(5 - values.length)
-        modified_value = values.first / modifier
+        modifier = 14**(values.length - 1)
+        modified_value = values.first * modifier
         if values.length == 1
             return modified_value
         else
@@ -35,6 +35,10 @@ class ScoreCalculator
             end
         end
         return false
+    end
+
+    def self.single_cards(cards)
+        self.count_of_each_card(cards).select {|card, count| count == 1 }.keys
     end
 
     def self.values(cards)

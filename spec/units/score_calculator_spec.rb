@@ -1,16 +1,16 @@
 describe ScoreCalculator do
     describe " #score" do
         context " for a high card" do
-            it "returns the value of the high card + a decreasing fraction of each subsequent card" do
+            it "returns points for each card, modified by a multiplier of base 14 depending on their importance" do
                 cards = [Card.new('hearts', 5), Card.new('spades', 9), Card.new('hearts', 8), Card.new('spades', 6), Card.new('hearts', 12)]
-                expected_score = 12 + (9/14) + (8/(14**2)) + (6/(14**3)) + (5/(14**4))
+                expected_score = 12*(14**4) + 9*(14**3) + (8*(14**2)) + (6*(14**1)) + (5*(14**0))
                 expect(ScoreCalculator.score(cards)).to eq expected_score
             end
         end
         context " for a pair" do
-            it "returns 20 points plus the value of the card, with other high cards processed as above" do
-                cards = [Card.new('hearts', 9), Card.new('spades', 9), Card.new('hearts', 8), Card.new('spades', 6), Card.new('hearts', 12)]
-                expected_score = 20 + 9 + (12/(14**2)) + (8/(14**3)) + (6/(14**4))
+            it "gives points for the value of the pair times 14^5 as well as points for high cards as above" do
+                cards = [Card.new('hearts', 9), Card.new('hearts', 2), Card.new('spades', 9), Card.new('spades', 6), Card.new('hearts', 12)]
+                expected_score = 9*(14**5) + (12*(14**2)) + (6*(14**1)) + (2*(14**0))
                 expect(ScoreCalculator.score(cards)).to eq expected_score
             end
         end
