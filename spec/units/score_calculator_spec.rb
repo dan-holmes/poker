@@ -28,5 +28,12 @@ describe ScoreCalculator do
                 expect(ScoreCalculator.score(cards)).to eq expected_score
             end
         end
+        context " for straight" do
+            it " gives points for the highest card times 14^8" do
+                cards = [Card.new('hearts', 11), Card.new('hearts', 9), Card.new('spades', 8), Card.new('spades', 10), Card.new('hearts', 12)]
+                expected_score = 12*(14**8)
+                expect(ScoreCalculator.score(cards)).to eq expected_score
+            end
+        end
     end
 end
