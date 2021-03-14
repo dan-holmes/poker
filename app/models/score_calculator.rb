@@ -1,21 +1,21 @@
 class ScoreCalculator
     def self.score(cards)
         if self.straight_flush(cards)
-            return self.straight_flush(cards) * 14**12
+            return self.straight_flush(cards) * 15**12
         elsif self.four_of_a_kind(cards)
-            return self.four_of_a_kind(cards) * 14**11 + self.score_high_card_values(self.single_cards(cards))
+            return self.four_of_a_kind(cards) * 15**11 + self.score_high_card_values(self.single_cards(cards))
         elsif self.full_house(cards)
-            return self.three_of_a_kind(cards) * 14**10 + self.pair(cards) * 14**9
+            return self.three_of_a_kind(cards) * 15**10 + self.pair(cards) * 15**9
         elsif self.flush(cards)
-            return self.score_high_card_values(self.values(cards)) * 14**(9 - 4)
+            return self.score_high_card_values(self.values(cards)) * 15**(9 - 4)
         elsif self.straight(cards)
-            return self.straight(cards) * 14**8
+            return self.straight(cards) * 15**8
         elsif self.three_of_a_kind(cards)
-            return self.three_of_a_kind(cards) * 14**7 + self.score_high_card_values(self.single_cards(cards))
+            return self.three_of_a_kind(cards) * 15**7 + self.score_high_card_values(self.single_cards(cards))
         elsif self.two_pair(cards)
-            return self.two_pair(cards)[0] * 14**6 + self.two_pair(cards)[1] * 14**5 + self.score_high_card_values(self.single_cards(cards))
+            return self.two_pair(cards)[0] * 15**6 + self.two_pair(cards)[1] * 15**5 + self.score_high_card_values(self.single_cards(cards))
         elsif self.pair(cards)
-            return self.pair(cards) * 14**5 + self.score_high_card_values(self.single_cards(cards))
+            return self.pair(cards) * 15**5 + self.score_high_card_values(self.single_cards(cards))
         else
             return self.score_high_card_values(self.values(cards))
         end
@@ -23,7 +23,7 @@ class ScoreCalculator
 
     def self.score_high_card_values(values)
         values.sort!.reverse!
-        modifier = 14**(values.length - 1)
+        modifier = 15**(values.length - 1)
         modified_value = values.first * modifier
         if values.length == 1
             return modified_value
@@ -55,10 +55,16 @@ class ScoreCalculator
     end
 
     def self.straight(cards)
-        sorted_values = values(cards).sort
-        unique = sorted_values.uniq == sorted_values
-        span_five = sorted_values.last - sorted_values.first == 4
-        unique && span_five ? sorted_values.last : false
+        values = values(cards)
+        ace_high = values
+        ace_low = values.map { |value| value == 14 ? 1 : value }
+        self.straight_literal(ace_high) || self.straight_literal(ace_low)
+    end
+
+    def self.straight_literal(values)
+        unique = values.uniq == values
+        span_five = values.max - values.min == 4
+        unique && span_five ? values.max : false
     end
 
     def self.flush(cards)
