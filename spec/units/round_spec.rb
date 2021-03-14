@@ -132,7 +132,8 @@ describe Round do
             round.bet(@player1, 100)
             round.bet(@player2, 100)
             round.bet(@player3, 100)
-            expect{ round.bet(@player4, 100) }.to change{ round.stage }.by(1)
+            expect(round).to receive(:increment_stage)
+            round.bet(@player4, 100)
         end
     end
     describe " #all_matched_or_folded" do
@@ -161,6 +162,20 @@ describe Round do
             round.bet(@player1, 150)
             round.bet(@player2, 150)
             expect(round.all_matched_or_folded).to be true
+        end
+    end
+    describe " #increment_stage" do
+        it "deals the appropriate community cards" do
+            round = Round.new(@players, @deck)
+            expect(round).to receive(:deal_flop)
+            round.increment_stage
+            expect(round).to receive(:deal_community)
+            round.increment_stage
+            expect(round).to receive(:deal_community)
+            round.increment_stage
+            expect(round).not_to receive(:deal_community)
+            expect(round).to receive(:end_round)
+            round.increment_stage
         end
     end
 end

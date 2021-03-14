@@ -80,6 +80,16 @@ class Round
     end
 
     def increment_stage
+        case @stage
+        when 0
+            deal_flop
+        when 1
+            deal_community
+        when 2
+            deal_community
+        when 3
+            end_round
+        end
         @stage += 1
     end
 end
