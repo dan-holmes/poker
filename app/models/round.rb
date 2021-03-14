@@ -1,5 +1,5 @@
 class Round
-    attr_reader :hands, :pot, :community_cards, :turn
+    attr_reader :hands, :pot, :community_cards, :turn, :stage
 
     def initialize(players, deck, hands = [])
         @deck = deck
@@ -12,6 +12,7 @@ class Round
         @turn = 0
         @bets = Hash[players.collect { |player| [player, 0] }]
         @folded = Hash[players.collect { |player| [player, false] }]
+        @stage = 0
     end
 
     def deal_hands(hand_class = Hand)
@@ -46,6 +47,7 @@ class Round
             positive_bet(player, amount)
         end
         @turn = @turn % @players.length
+        all_matched_or_folded
     end
 
     def fold(player)
@@ -73,6 +75,11 @@ class Round
         for player in @players
             return false if @bets[player] < current_bet && !@folded[player]
         end
+        increment_stage    
         return true
+    end
+
+    def increment_stage
+        @stage += 1
     end
 end

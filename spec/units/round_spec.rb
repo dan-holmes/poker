@@ -127,6 +127,13 @@ describe Round do
             round.bet(@player3, 150)
             expect(round.all_matched_or_folded).to be true
         end
+        it "moves to the next round if all matched or folded" do
+            round = Round.new(@players, @deck)
+            round.bet(@player1, 100)
+            round.bet(@player2, 100)
+            round.bet(@player3, 100)
+            expect{ round.bet(@player4, 100) }.to change{ round.stage }.by(1)
+        end
     end
     describe " #all_matched_or_folded" do
         it "Is true if all players have matched first bet" do
