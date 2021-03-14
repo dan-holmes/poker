@@ -50,9 +50,16 @@ describe ScoreCalculator do
             end
         end
         context " for four of a kind" do
-            it "gives points time 14^11 plus high card as usual" do
+            it "gives points times 14^11 plus high card as usual" do
                 cards = [Card.new('hearts', 5), Card.new('spades', 10), Card.new('hearts', 10), Card.new('spades', 10), Card.new('hearts', 10)]
                 expected_score = 10*(14**11) + 5*(14**0)
+                expect(ScoreCalculator.score(cards)).to eq expected_score
+            end
+        end
+        context " for a straight flush" do
+            it "gives points times 14^12 for highest card" do
+                cards = [Card.new('hearts', 8), Card.new('hearts', 9), Card.new('hearts', 10), Card.new('hearts', 11), Card.new('hearts', 12)]
+                expected_score = 12*(14**12)
                 expect(ScoreCalculator.score(cards)).to eq expected_score
             end
         end

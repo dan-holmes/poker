@@ -1,6 +1,8 @@
 class ScoreCalculator
     def self.score(cards)
-        if self.four_of_a_kind(cards)
+        if self.straight_flush(cards)
+            return self.straight_flush(cards) * 14**12
+        elsif self.four_of_a_kind(cards)
             return self.four_of_a_kind(cards) * 14**11 + self.score_high_card_values(self.single_cards(cards))
         elsif self.full_house(cards)
             return self.three_of_a_kind(cards) * 14**10 + self.pair(cards) * 14**9
@@ -71,6 +73,10 @@ class ScoreCalculator
 
     def self.four_of_a_kind(cards)
         self.count_of_each_card(cards).select { |value, count| count == 4 }.keys.first
+    end
+    
+    def self.straight_flush(cards)
+        self.straight(cards) && self.flush(cards) ? self.straight(cards) : false
     end
 
     def self.single_cards(cards)
