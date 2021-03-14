@@ -14,5 +14,19 @@ describe ScoreCalculator do
                 expect(ScoreCalculator.score(cards)).to eq expected_score
             end
         end
+        context " for two pairs" do
+            it "gives points for the first pair times 14^6, second pair 14^5 and high card as usual" do
+                cards = [Card.new('hearts', 11), Card.new('hearts', 4), Card.new('spades', 4), Card.new('spades', 12), Card.new('hearts', 11)]
+                expected_score = 11*(14**6) + 4*(14**5) + 12*(14**0)
+                expect(ScoreCalculator.score(cards)).to eq expected_score
+            end
+        end
+        context " for three of a kind" do
+            it "gives points times 14^7 plus high cards as usual" do
+                cards = [Card.new('hearts', 11), Card.new('hearts', 4), Card.new('spades', 2), Card.new('spades', 11), Card.new('hearts', 11)]
+                expected_score = 11*(14**7) + 4*(14**1) + 2*(14**0)
+                expect(ScoreCalculator.score(cards)).to eq expected_score
+            end
+        end
     end
 end

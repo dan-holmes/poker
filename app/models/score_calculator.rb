@@ -1,6 +1,10 @@
 class ScoreCalculator
     def self.score(cards)
-        if self.pair(cards)
+        if self.three_of_a_kind(cards)
+            return self.three_of_a_kind(cards) * 14**7 + self.score_high_card_values(self.single_cards(cards))
+        elsif self.two_pair(cards)
+            return self.two_pair(cards)[0] * 14**6 + self.two_pair(cards)[1] * 14**5 + self.score_high_card_values(self.single_cards(cards))
+        elsif self.pair(cards)
             return self.pair(cards) * 14**5 + self.score_high_card_values(self.single_cards(cards))
         else
             return self.score_high_card_values(self.values(cards))
@@ -28,13 +32,16 @@ class ScoreCalculator
     end
 
     def self.pair(cards)
-        count_hash = self.count_of_each_card(cards)
-        for value, count in count_hash
-            if count == 2
-                return value
-            end
-        end
-        return false
+        self.count_of_each_card(cards).select { |value, count| count == 2 }.keys.first
+    end
+
+    def self.two_pair(cards)
+        pair_values = self.count_of_each_card(cards).select { |value, count| count == 2}.keys
+        pair_values.length == 2 ? pair_values.sort!.reverse! : false
+    end
+
+    def self.three_of_a_kind(cards)
+        self.count_of_each_card(cards).select { |value, count| count == 3 }.keys.first
     end
 
     def self.single_cards(cards)
