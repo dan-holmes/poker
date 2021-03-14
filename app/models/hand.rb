@@ -9,13 +9,18 @@ class Hand
 
     def score(community_cards)
         best_score = 0
-        all_cards = @cards.concat(community_cards)
+        all_cards = @cards + community_cards
         for combination in all_cards.combination(5).to_a do
             score = @score_calculator.score(combination)
             if score > best_score
                 best_score = score
             end
         end
+        # puts print + "(" + community_cards.map{|card| card.print }.join(' ') +  ")" + ": " + best_score.to_s
         return best_score
+    end
+
+    def print
+        @player.name + " - " + cards[0].print + " " + cards[1].print
     end
 end
