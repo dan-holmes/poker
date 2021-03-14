@@ -9,4 +9,9 @@ class Player
     def deposit(chips)
         @stack += chips
     end
+
+    def debit(chips)
+        raise "Not enough chips." if chips > @stack
+        @stack -= chips
+    end
 end

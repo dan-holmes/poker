@@ -1,6 +1,8 @@
 describe Round do
     before(:each) do
-        @players = [double(:player), double(:player), double(:player), double(:player)]
+        @player1 = double(:player, debit: nil)
+        @player2 = double(:player, debit: nil)
+        @players = [@player1, @player2, double(:player), double(:player)]
         @deck = double(:deck, {reset: nil, shuffle: nil, deal_card: double(:card)})
     end
     describe "initialize" do
@@ -66,6 +68,28 @@ describe Round do
             round.deal_community
 
             expect(round.get_winner).to eq player2
+        end
+    end
+
+    describe " #bet" do
+        it "increases the pot" do
+            round = Round.new(@players, @deck)
+            expect {round.bet(@player1, 100)}.to change{ round.pot }.by(100)
+        end
+        it "debits the amount from the player's stack" do
+            round = Round.new([@player1, double(:player)], @deck)
+            expect(@player1).to receive(:debit).with(100)
+            round.bet(@player1, 100)
+        end
+        it "increases the current bet to that amount" do
+            round = Round.new(@players, @deck)
+            round.bet(@player1, 100)
+            expect(round.current_bet).to eq 100
+        end
+        it "errors if bet is too low" do
+            round = Round.new(@players, @deck)
+            round.bet(@player1, 100)
+            expect{ round.bet(@player2, 50) }.to raise_error "Bet too low."
         end
     end
 end

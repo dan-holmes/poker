@@ -1,5 +1,5 @@
 class Round
-    attr_reader :hands, :pot, :community_cards
+    attr_reader :hands, :pot, :community_cards, :current_bet
 
     def initialize(players, deck, hands = [])
         @deck = deck
@@ -8,6 +8,7 @@ class Round
         @players = players
         @hands = hands
         @pot = 0
+        @current_bet = 0
         @community_cards = []
     end
 
@@ -33,5 +34,12 @@ class Round
             end
         end
         return winning_hand.player
+    end
+
+    def bet(player, amount)
+        raise "Bet too low." if amount < current_bet
+        @pot += amount
+        player.debit(100)
+        @current_bet = amount
     end
 end
