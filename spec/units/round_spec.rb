@@ -175,13 +175,35 @@ describe Round do
             expect(round).not_to receive(:deal_community)
             round.increment_stage
         end
-        it "ends the round on after the last stage" do
+        it "ends the round after the last stage" do
             round = Round.new(@players, @deck)
             round.increment_stage
             round.increment_stage
             round.increment_stage
             expect(round).to receive(:end_round)
             round.increment_stage
+        end
+    end
+    describe " #end_round" do
+        it "gives the pot to the winning hand" do
+            round = Round.new(@players, @deck)
+            allow(round).to receive(:pot).and_return(100)
+            allow(round).to receive(:get_winner).and_return(@player1)
+            expect(@player1).to receive(:deposit).with(100)
+            round.end_round
+        end
+        it "returns the winning hand, including the winner" do
+            round = Round.new(@players, @deck)
+            card1 = double(:card)
+            card2 = double(:card)
+            hand1 = double(:hand, {score: 10, player: @player1, cards: [card1, card2]})
+            hand2 = double(:hand, {player: double(:player)})
+            hands = [hand1, hand2]
+            allow(round).to receive(:hands).and_return(hands)
+            allow(round).to receive(:get_winner).and_return(@player1)
+            output = round.end_round
+            expect(output.player).to eq @player1
+            expect(output.cards).to eq [card1, card2]
         end
     end
 end

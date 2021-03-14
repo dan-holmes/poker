@@ -1,5 +1,5 @@
 class Round
-    attr_reader :pot, :community_cards, :turn, :stage
+    attr_reader :community_cards, :turn, :stage
 
     def initialize(players, deck, hand_class = Hand)
         @deck = deck
@@ -96,11 +96,15 @@ class Round
 
     def end_round
         winner = get_winner
-        winner.deposit(@pot)
+        winner.deposit(pot)
         return hands.select{ |hand| hand.player == winner }.first
     end
 
     def hands
         @hands
+    end
+
+    def pot
+        @pot
     end
 end
