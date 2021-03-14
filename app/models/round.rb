@@ -1,5 +1,5 @@
 class Round
-    attr_reader :hands, :pot, :community_cards, :turn, :current_bet
+    attr_reader :hands, :pot, :community_cards, :turn
 
     def initialize(players, deck, hands = [])
         @deck = deck
@@ -8,9 +8,10 @@ class Round
         @players = players
         @hands = hands
         @pot = 0
-        @current_bet = 0
         @community_cards = []
         @turn = 0
+        @bets = Hash[players.collect { |player| [player, 0] }]
+        @folded = Hash[players.collect { |player| [player, false] }]
     end
 
     def deal_hands(hand_class = Hand)
@@ -38,15 +39,26 @@ class Round
     end
 
     def bet(player, amount)
-        raise "Bet too low." if amount < @current_bet
+        raise "Bet too low." if amount < current_bet
         raise "Play out of turn." if player_to_bet != player
         @pot += amount
+        @bets[player] = amount
         player.debit(100)
-        @current_bet = amount
-        @turn += 1
+        @turn = (@turn + 1) % @players.length
     end
 
     def player_to_bet
         @players[turn]
+    end
+
+    def current_bet
+        @bets.values.max
+    end
+
+    def all_matched_or_folded
+        for player in @players
+            return false if @bets[player] < current_bet && !@folded[player]
+        end
+        return true
     end
 end

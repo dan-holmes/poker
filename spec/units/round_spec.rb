@@ -3,7 +3,8 @@ describe Round do
         @player1 = double(:player, debit: nil)
         @player2 = double(:player, debit: nil)
         @player3 = double(:player, debit: nil)
-        @players = [@player1, @player2, @player3, double(:player)]
+        @player4 = double(:player, debit: nil)
+        @players = [@player1, @player2, @player3, @player4]
         @deck = double(:deck, {reset: nil, shuffle: nil, deal_card: double(:card)})
     end
     describe "initialize" do
@@ -106,6 +107,41 @@ describe Round do
             round = Round.new(@players, @deck)
             round.bet(@player1, 100)
             expect{ round.bet(@player2, 100) }.to_not raise_error
+        end
+        it "moves turn to first player if last player bets" do
+            round = Round.new(@players, @deck)
+            round.bet(@player1, 100)
+            round.bet(@player2, 100)
+            round.bet(@player3, 100)
+            expect{ round.bet(@player4, 100) }.to change{ round.turn }.from(3).to(0)
+        end
+    end
+    describe " #all_bet" do
+        it "Is true if all players have matched first bet" do
+            round = Round.new(@players, @deck)
+            round.bet(@player1, 100)
+            round.bet(@player2, 100)
+            round.bet(@player3, 100)
+            round.bet(@player4, 100)
+            expect(round.all_matched_or_folded).to be true
+        end
+        it "Is false if somebody has raised and not all have matched" do
+            round = Round.new(@players, @deck)
+            round.bet(@player1, 100)
+            round.bet(@player2, 100)
+            round.bet(@player3, 150)
+            round.bet(@player4, 150)
+            expect(round.all_matched_or_folded).to be false
+        end
+        it "Is true if one player has raised and all have matched" do
+            round = Round.new(@players, @deck)
+            round.bet(@player1, 100)
+            round.bet(@player2, 100)
+            round.bet(@player3, 150)
+            round.bet(@player4, 150)
+            round.bet(@player1, 150)
+            round.bet(@player2, 150)
+            expect(round.all_matched_or_folded).to be true
         end
     end
 end
