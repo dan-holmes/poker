@@ -6,7 +6,7 @@ class Round
         @deck.reset
         @deck.shuffle
         @players = players
-        @hands = []
+        @hands = Hash.new
         @pot = 0
         @community_cards = []
         @turn = 0
@@ -19,7 +19,7 @@ class Round
 
     def deal_hands(hand_class)
         for player in @players do
-            @hands.push(hand_class.new(player, @deck))
+            @hands[player] = hand_class.new(@deck)
         end
     end
 
@@ -34,12 +34,14 @@ class Round
     def get_winner
         raise "Round still in progress." if stage < 4
         winning_player = @players.first
-        winning_score = hands.select{ |hand| hand.player == winning_player }.first.score(community_cards)
+        winning_score = hands[winning_player].score(community_cards)
         for player in @players do
-            score = hands.select{ |hand| hand.player == player }.first.score(community_cards)
-            if score > winning_score
-                winning_player = player
-                winning_score = score
+            if !folded[player]
+                score = hands[player].score(community_cards)
+                if score > winning_score
+                    winning_player = player
+                    winning_score = score
+                end
             end
         end
         return winning_player
@@ -120,5 +122,9 @@ class Round
 
     def stage
         @stage
+    end
+
+    def folded
+        @folded
     end
 end

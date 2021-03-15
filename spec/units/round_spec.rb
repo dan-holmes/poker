@@ -19,7 +19,7 @@ describe Round do
         it "create a hand for each player" do
             hand_class = double(:hand_class, {new: double(:hand)})
             round = Round.new(@players, @deck, hand_class)
-            expect(round.hands.length).to eq @players.length
+            expect(round.hands.values.length).to eq @players.length
         end
     end
 
@@ -53,10 +53,11 @@ describe Round do
 
     describe '#get_winner' do
         it "returns the player with the winning hand" do
-            hand1 = double(:hand, {score: 10, player: @player1})
-            hand2 = double(:hand, {score: 20, player: @player2})
-            hand3 = double(:hand, {score: 15, player: @player3})
-            hands = [hand1, hand2, hand3]
+            hand1 = double(:hand, {score: 10})
+            hand2 = double(:hand, {score: 20})
+            hand3 = double(:hand, {score: 15})
+            hand4 = double(:hand, {score: 5})
+            hands = {@player1 => hand1, @player2 => hand2, @player3 => hand3, @player4 => hand4}
 
             round = Round.new(@players, @deck)
             round.deal_flop
@@ -66,7 +67,26 @@ describe Round do
             allow(round).to receive(:hands).and_return(hands)
             allow(round).to receive(:stage).and_return(4)
 
-            expect(round.get_winner).to eq player2
+            expect(round.get_winner).to eq @player2
+        end
+        it "will not count folded hands" do
+            hand1 = double(:hand, {score: 10})
+            hand2 = double(:hand, {score: 20})
+            hand3 = double(:hand, {score: 15})
+            hand4 = double(:hand, {score: 5})
+            hands = {@player1 => hand1, @player2 => hand2, @player3 => hand3, @player4 => hand4}
+            folded = {@player1 => false, @player2 => true, @player3 => false, @player4 => false}
+
+            round = Round.new(@players, @deck)
+            round.deal_flop
+            round.deal_community
+            round.deal_community
+
+            allow(round).to receive(:hands).and_return(hands)
+            allow(round).to receive(:folded).and_return(folded)
+            allow(round).to receive(:stage).and_return(4)
+
+            expect(round.get_winner).to eq @player3
         end
         it "returns an error if the round isn't over" do
             round = Round.new(@players, @deck)

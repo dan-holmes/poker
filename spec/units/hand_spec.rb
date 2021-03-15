@@ -1,23 +1,21 @@
 describe Hand do
     describe "#initialize" do
         it "calls deck.deal_card twice to add 2 cards" do
-            player = double(:player)
             deck = double(:deck)
             expect(deck).to receive(:deal_card).exactly(2).times
-            hand = Hand.new(player, deck, double(:score_calculator))
+            hand = Hand.new(deck, double(:score_calculator))
             expect(hand.cards.length).to eq 2
         end
     end
     describe "#score" do
         it "gets the best available score for 5 of the 7 cards" do
-            player = double(:player)
             deck = double(:deck)
             hc1 = double(:card)
             hc2 = double(:card)
             score_calculator = double(:score_calculator)
 
             allow(deck).to receive(:deal_card).and_return(hc1, hc2)
-            @hand = Hand.new(player, deck, score_calculator)
+            @hand = Hand.new(deck, score_calculator)
 
             cc1 = double(:card)
             cc2 = double(:card)
