@@ -32,7 +32,7 @@ class Round
     end
 
     def get_winner
-        raise "Round still in progress." if stage < 4
+        return false if stage < 4
         winning_player = @players.first
         winning_score = hands[winning_player].score(community_cards)
         for player in @players do

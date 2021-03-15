@@ -88,9 +88,9 @@ describe Round do
 
             expect(round.get_winner).to eq @player3
         end
-        it "returns an error if the round isn't over" do
+        it "returns false if the round isn't over" do
             round = Round.new(@players, @deck)
-            expect{ round.get_winner }.to raise_error "Round still in progress."
+            expect(round.get_winner).to eq false
         end
     end
 
