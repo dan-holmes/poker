@@ -1,5 +1,5 @@
 class Round
-    attr_reader :community_cards, :turn, :stage
+    attr_reader :community_cards, :turn
 
     def initialize(players, deck, hand_class = Hand)
         @deck = deck
@@ -32,13 +32,17 @@ class Round
     end
 
     def get_winner
-        winning_hand = hands.first
-        for hand in hands do
-            if hand.score(community_cards) > winning_hand.score(community_cards)
-                winning_hand = hand
+        raise "Round still in progress." if stage < 4
+        winning_player = @players.first
+        winning_score = hands.select{ |hand| hand.player == winning_player }.first.score(community_cards)
+        for player in @players do
+            score = hands.select{ |hand| hand.player == player }.first.score(community_cards)
+            if score > winning_score
+                winning_player = player
+                winning_score = score
             end
         end
-        return winning_hand.player
+        return winning_player
     end
 
     def bet(player, amount)
@@ -85,27 +89,25 @@ class Round
     end
 
     def increment_stage
+        @stage += 1
         case @stage
-        when 0
-            deal_flop
         when 1
-            deal_community
+            deal_flop
         when 2
             deal_community
         when 3
-            return end_round
+            deal_community
+        when 4
+            allocate_winnings
         end
         @turn = 0
         @bets = Hash[@players.collect { |player| [player, 0] }]
         @bet_this_round = Hash[@players.collect { |player| [player, false] }]
-        @stage += 1
-        return true
     end
 
-    def end_round
+    def allocate_winnings
         winner = get_winner
         winner.deposit(pot)
-        return hands.select{ |hand| hand.player == winner }.first
     end
 
     def hands
@@ -114,5 +116,9 @@ class Round
 
     def pot
         @pot
+    end
+
+    def stage
+        @stage
     end
 end

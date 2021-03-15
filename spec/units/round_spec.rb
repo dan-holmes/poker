@@ -53,12 +53,9 @@ describe Round do
 
     describe '#get_winner' do
         it "returns the player with the winning hand" do
-            player1 = double(:player)
-            player2 = double(:player)
-            player3 = double(:player)
-            hand1 = double(:hand, {score: 10, player: player1})
-            hand2 = double(:hand, {score: 20, player: player2})
-            hand3 = double(:hand, {score: 15, player: player3})
+            hand1 = double(:hand, {score: 10, player: @player1})
+            hand2 = double(:hand, {score: 20, player: @player2})
+            hand3 = double(:hand, {score: 15, player: @player3})
             hands = [hand1, hand2, hand3]
 
             round = Round.new(@players, @deck)
@@ -67,8 +64,13 @@ describe Round do
             round.deal_community
 
             allow(round).to receive(:hands).and_return(hands)
+            allow(round).to receive(:stage).and_return(4)
 
             expect(round.get_winner).to eq player2
+        end
+        it "returns an error if the round isn't over" do
+            round = Round.new(@players, @deck)
+            expect{ round.get_winner }.to raise_error "Round still in progress."
         end
     end
 
@@ -185,35 +187,22 @@ describe Round do
             round.increment_stage
             expect{round.bet(@player1, 50)}.not_to raise_error
         end
-        it "ends the round after the last stage" do
+        it "allocates winnings after the last stage" do
             round = Round.new(@players, @deck)
             round.increment_stage
             round.increment_stage
             round.increment_stage
-            expect(round).to receive(:end_round)
+            expect(round).to receive(:allocate_winnings)
             round.increment_stage
         end
     end
-    describe " #end_round" do
+    describe " #allocate_winnings" do
         it "gives the pot to the winning hand" do
             round = Round.new(@players, @deck)
             allow(round).to receive(:pot).and_return(100)
             allow(round).to receive(:get_winner).and_return(@player1)
             expect(@player1).to receive(:deposit).with(100)
-            round.end_round
-        end
-        it "returns the winning hand, including the winner" do
-            round = Round.new(@players, @deck)
-            card1 = double(:card)
-            card2 = double(:card)
-            hand1 = double(:hand, {score: 10, player: @player1, cards: [card1, card2]})
-            hand2 = double(:hand, {player: double(:player)})
-            hands = [hand1, hand2]
-            allow(round).to receive(:hands).and_return(hands)
-            allow(round).to receive(:get_winner).and_return(@player1)
-            output = round.end_round
-            expect(output.player).to eq @player1
-            expect(output.cards).to eq [card1, card2]
+            round.allocate_winnings
         end
     end
 end
