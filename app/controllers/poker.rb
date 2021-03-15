@@ -3,7 +3,13 @@ class Poker < Sinatra::Base
     session_secret
     set :session_secret, "here be dragons"
     
-    
+    configure do
+        enable :cross_origin
+    end
+
+    before do
+        response.headers['Access-Control-Allow-Origin'] = '*'
+    end
 
     get '/round' do
         content_type :json
@@ -11,8 +17,8 @@ class Poker < Sinatra::Base
             pot: Game.round.pot,
             current_bet: Game.round.current_bet,
             player_to_bet: Game.round.player_to_bet.name,
-            community_cards: Game.round.community_cards.map{ |card| card.print },
-            hands: Game.round.hands.map{ |player, hand| {player: player.name, cards: hand.cards.map{ |card| card.print }}},
+            community_cards: Game.round.community_cards.map{ |card| card.json },
+            hands: Game.round.hands.map{ |player, hand| {player: player.name, cards: hand.cards.map{ |card| card.json }}},
             winner: Game.round.get_winner
             }
         data.to_json

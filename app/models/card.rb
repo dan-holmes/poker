@@ -27,4 +27,11 @@ class Card
     def print_suit
         suit[0].upcase
     end
+
+    def json
+        {
+            suit: print_suit,
+            value: print_value
+        }
+    end
 end

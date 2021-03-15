@@ -1,6 +1,7 @@
 ENV["RACK_ENV"] ||= "development"
 
 require "sinatra/base"
+require 'sinatra/cross_origin'
 require "json"
 
 require_relative "models/score_calculator"
