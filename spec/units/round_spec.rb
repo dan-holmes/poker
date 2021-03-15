@@ -117,14 +117,12 @@ describe Round do
         it "can handle folds" do
             round = Round.new(@players, @deck)
             round.bet(@player1, 100)
-            round.bet(@player2, false)
+            round.bet(@player2, -1)
             round.bet(@player3, 100)
             round.bet(@player4, 150)
-            round.bet(@player1, 150)
-            expect(round.player_to_bet).to eq @player3
-            expect(round.all_matched_or_folded).to be false
-            round.bet(@player3, 150)
-            expect(round.all_matched_or_folded).to be true
+            round.bet(@player1, 50)
+            expect(round).to receive(:increment_stage)
+            round.bet(@player3, 50)
         end
         it "moves to the next round if all matched or folded" do
             round = Round.new(@players, @deck)
@@ -136,31 +134,31 @@ describe Round do
         end
     end
     describe " #all_matched_or_folded" do
-        it "Is true if all players have matched first bet" do
+        it "Increments stage if all players have matched first bet" do
             round = Round.new(@players, @deck)
             round.bet(@player1, 100)
             round.bet(@player2, 100)
             round.bet(@player3, 100)
+            expect(round).to receive(:increment_stage)
             round.bet(@player4, 100)
-            expect(round.all_matched_or_folded).to be true
         end
-        it "Is false if somebody has raised and not all have matched" do
+        it "Doesn't increment stage if somebody has raised and not all have matched" do
+            round = Round.new(@players, @deck)
+            round.bet(@player1, 100)
+            round.bet(@player2, 100)
+            round.bet(@player3, 150)
+            expect(round).not_to receive(:increment_stage)
+            round.bet(@player4, 150)
+        end
+        it "Increments stage if one player has raised and all have matched" do
             round = Round.new(@players, @deck)
             round.bet(@player1, 100)
             round.bet(@player2, 100)
             round.bet(@player3, 150)
             round.bet(@player4, 150)
-            expect(round.all_matched_or_folded).to be false
-        end
-        it "Is true if one player has raised and all have matched" do
-            round = Round.new(@players, @deck)
-            round.bet(@player1, 100)
-            round.bet(@player2, 100)
-            round.bet(@player3, 150)
-            round.bet(@player4, 150)
-            round.bet(@player1, 150)
-            round.bet(@player2, 150)
-            expect(round.all_matched_or_folded).to be true
+            round.bet(@player1, 50)
+            expect(round).to receive(:increment_stage)
+            round.bet(@player2, 50)
         end
     end
     describe " #increment_stage" do
@@ -174,6 +172,18 @@ describe Round do
             round.increment_stage
             expect(round).not_to receive(:deal_community)
             round.increment_stage
+        end
+        it "resets the turn" do
+            round = Round.new(@players, @deck)
+            round.bet(@player1, 100)
+            round.increment_stage
+            expect{round.bet(@player1, 100)}.not_to raise_error
+        end
+        it "resets the current bet" do
+            round = Round.new(@players, @deck)
+            round.bet(@player1, 100)
+            round.increment_stage
+            expect{round.bet(@player1, 50)}.not_to raise_error
         end
         it "ends the round after the last stage" do
             round = Round.new(@players, @deck)

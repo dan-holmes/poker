@@ -14,4 +14,8 @@ class Player
         raise "Not enough chips." if chips > @stack
         @stack -= chips
     end
+
+    def print
+        @name + " " + @stack.to_s
+    end
 end
