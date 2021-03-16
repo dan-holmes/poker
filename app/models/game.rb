@@ -9,6 +9,10 @@ class Game
         @round = Round.new(@players, @deck)
     end
 
+    def self.new_round
+        @round = Round.new(@players, @deck)
+    end
+
     def self.round
         @round
     end
