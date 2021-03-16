@@ -1,3 +1,5 @@
+require 'jwt'
+
 class Poker < Sinatra::Base
     enable :sessions
     session_secret
@@ -11,17 +13,29 @@ class Poker < Sinatra::Base
         response.headers['Access-Control-Allow-Origin'] = '*'
     end
 
+    post '/players' do
+        name = params["name"]
+        Game.add_player(name)
+        content_type :json
+        { token: token(name) }.to_json
+    end
+
     get '/round' do
         content_type :json
-        data = { 
-            pot: Game.round.pot,
-            current_bet: Game.round.current_bet,
-            player_to_bet: Game.round.player_to_bet.name,
-            community_cards: Game.round.community_cards.map{ |card| card.json },
-            hands: Game.round.hands.map{ |player, hand| {player: player.name, cards: hand.cards.map{ |card| card.json }}},
-            winner: Game.round.get_winner
-            }
-        data.to_json
+        if Game.round
+            Game.round.json(session[:player_name])
+        else
+            {
+            round: false,
+            hands:
+                Game.players.map{ |player|
+                    {
+                        player: player.json,
+                        cards: []
+                    }
+                }
+            }.to_json
+        end
     end
 
     get '/round/new' do
@@ -29,11 +43,15 @@ class Poker < Sinatra::Base
     end
 
     post '/bets' do
-        puts params
-        player = Game.get_player(params[:player_name])
+        decoded_token = JWT.decode(params[:token], nil, false)
+        player = Game.get_player(decoded_token[0]["player_name"])
         amount = params[:amount].to_i
         Game.round.bet(player, amount)
         201
+    end
+
+    def token(player_name)
+        JWT.encode( { player_name: player_name } , nil, 'none')
     end
 
     options "*" do

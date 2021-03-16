@@ -127,4 +127,21 @@ class Round
     def folded
         @folded
     end
+
+    def json(player_name)
+        { 
+            round: true,
+            pot: @pot,
+            current_bet: @current_bet,
+            player_to_bet: player_to_bet.name,
+            community_cards: @community_cards.map{ |card| card.json },
+            hands: @hands.map{ |player, hand| {
+                player: player.json, 
+                cards: hand.cards.map{ |card| 
+                    player.name == player_name ? card.json : Card.blank_json
+                }
+            }},
+            winner: get_winner
+            }.to_json
+    end
 end

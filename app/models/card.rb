@@ -34,4 +34,11 @@ class Card
             value: print_value
         }
     end
+
+    def self.blank_json
+        {
+            suit: 'X',
+            value: 'X'
+        }
+    end
 end

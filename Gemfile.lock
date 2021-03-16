@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.4.4)
+    jwt (2.2.2)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
     rack (2.2.3)
@@ -33,6 +34,7 @@ PLATFORMS
   x64-mingw32
 
 DEPENDENCIES
+  jwt (~> 2.2)
   rspec
   sinatra
   sinatra-cross_origin (~> 0.4.0)

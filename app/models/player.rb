@@ -18,4 +18,11 @@ class Player
     def print
         @name + " " + @stack.to_s
     end
+
+    def json
+        {
+            name: @name,
+            stack: @stack
+        }
+    end
 end
