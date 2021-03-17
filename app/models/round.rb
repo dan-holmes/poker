@@ -132,7 +132,7 @@ class Round
         { 
             round: true,
             pot: @pot,
-            current_bet: @current_bet,
+            current_bet: current_bet,
             player_to_bet: player_to_bet.name,
             community_cards: @community_cards.map{ |card| card.json },
             hands: @hands.map{ |player, hand| {

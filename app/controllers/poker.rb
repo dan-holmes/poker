@@ -15,15 +15,19 @@ class Poker < Sinatra::Base
 
     post '/players' do
         name = params["name"]
+        puts('Adding player ' + name)
         Game.add_player(name)
         content_type :json
         { token: token(name) }.to_json
     end
 
     get '/round' do
+        token = request.env["HTTP_AUTHORIZATION"].split(' ').last
+        decoded_token = JWT.decode(token, nil, false)
+        player = Game.get_player(decoded_token[0]["player_name"])
         content_type :json
         if Game.round
-            Game.round.json(session[:player_name])
+            Game.round.json(player.name)
         else
             {
             round: false,
@@ -43,7 +47,8 @@ class Poker < Sinatra::Base
     end
 
     post '/bets' do
-        decoded_token = JWT.decode(params[:token], nil, false)
+        token = request.env["HTTP_AUTHORIZATION"].split(' ').last
+        decoded_token = JWT.decode(token, nil, false)
         player = Game.get_player(decoded_token[0]["player_name"])
         amount = params[:amount].to_i
         Game.round.bet(player, amount)
