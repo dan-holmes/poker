@@ -20,7 +20,7 @@ class Deck
     def generate_cards
         cards = []
         for suit in ['hearts', 'diamonds', 'spades', 'clubs'] do
-            for value in 1..13 do
+            for value in 2..14 do
                 cards.push(Card.new(suit, value))
             end
         end
