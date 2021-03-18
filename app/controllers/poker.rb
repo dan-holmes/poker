@@ -15,8 +15,10 @@ class Poker < Sinatra::Base
 
     post '/players' do
         name = params["name"]
-        puts('Adding player ' + name)
-        Game.add_player(name)
+        if !Game.players.map{ |player| player.name }.include?(name)
+            puts('Adding player ' + name)
+            Game.add_player(name)
+        end
         content_type :json
         { token: token(name) }.to_json
     end
@@ -37,7 +39,8 @@ class Poker < Sinatra::Base
                         player: player.json,
                         cards: []
                     }
-                }
+                },
+            winner: false
             }.to_json
         end
     end

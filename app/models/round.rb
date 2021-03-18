@@ -47,6 +47,10 @@ class Round
         return winning_player
     end
 
+    def get_winner_name
+        !!get_winner ? get_winner.name : false
+    end
+
     def bet(player, amount)
         raise "Play out of turn." if player_to_bet != player
         if amount == -1
@@ -73,7 +77,12 @@ class Round
     end
 
     def player_to_bet
+        false if !!get_winner
         @players[turn]
+    end
+
+    def player_to_bet_name
+        !!player_to_bet ? player_to_bet.name : false
     end
 
     def current_bet
@@ -133,7 +142,7 @@ class Round
             round: true,
             pot: @pot,
             current_bet: current_bet,
-            player_to_bet: player_to_bet.name,
+            player_to_bet: player_to_bet_name,
             community_cards: @community_cards.map{ |card| card.json },
             hands: @hands.map{ |player, hand| {
                 player: player.json, 
@@ -141,7 +150,7 @@ class Round
                     player.name == player_name ? card.json : Card.blank_json
                 }
             }},
-            winner: get_winner
+            winner: get_winner_name
             }.to_json
     end
 end
