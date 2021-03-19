@@ -120,6 +120,7 @@ class Round
             allocate_winnings
         end
         @turn = 0
+        increment_turn if @folded[player_to_bet]
         @bets = Hash[@players.collect { |player| [player, 0] }]
         @bet_this_round = Hash[@players.collect { |player| [player, false] }]
     end

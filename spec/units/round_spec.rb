@@ -5,7 +5,7 @@ describe Round do
         @player3 = double(:player, debit: nil, deposit: nil)
         @player4 = double(:player, debit: nil, deposit: nil)
         @players = [@player1, @player2, @player3, @player4]
-        @deck = double(:deck, {reset: nil, shuffle: nil, deal_card: double(:card)})
+        @deck = double(:deck, {reset: nil, shuffle: nil, deal_card: double(:card, value: 10, suit: 'Hearts')})
     end
     describe "initialize" do
         it "resets deck and shuffles it" do
@@ -233,6 +233,14 @@ describe Round do
             expect(round).to receive(:allocate_winnings)
             round.fold(@player3)
             expect(round.completed).to eq true
+        end
+        it "Stops that player getting another turn" do
+            round = Round.new(@players, @deck)
+            round.fold(@player1)
+            round.bet(@player2, 10)
+            round.bet(@player3, 10)
+            round.bet(@player4, 10)
+            expect(round.player_to_bet).to eq @player2
         end
     end
 end
