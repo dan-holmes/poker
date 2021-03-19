@@ -34,15 +34,13 @@ class Round
 
     def get_winner
         return false if !completed
-        winning_player = @players.first
+        winning_player = unfolded_players.first
         winning_score = hands[winning_player].score(community_cards)
-        for player in @players do
-            if !folded[player]
-                score = hands[player].score(community_cards)
-                if score > winning_score
-                    winning_player = player
-                    winning_score = score
-                end
+        for player in unfolded_players do
+            score = hands[player].score(community_cards)
+            if score > winning_score
+                winning_player = player
+                winning_score = score
             end
         end
         return winning_player
@@ -50,6 +48,10 @@ class Round
 
     def get_winner_name
         !!get_winner ? get_winner.name : false
+    end
+
+    def unfolded_players
+        folded.select{ |player, folded| !folded }.keys
     end
 
     def bet(player, amount)
@@ -68,7 +70,7 @@ class Round
         @folded[player] = true
         increment_turn
         increment_stage if all_matched_or_folded
-        end_round if @folded.select{ |player, folded| !folded }.length == 1
+        end_round if unfolded_players.length == 1
     end
 
     def increment_turn
