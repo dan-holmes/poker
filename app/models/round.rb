@@ -1,5 +1,5 @@
 class Round
-    attr_reader :community_cards, :turn
+    attr_reader :community_cards, :turn, :bets
 
     def initialize(players, deck, hand_class = Hand)
         @deck = deck
@@ -54,25 +54,30 @@ class Round
 
     def bet(player, amount)
         raise "Play out of turn." if player_to_bet != player
-        if amount == -1
-            fold(player)
-        else
-            positive_bet(player, amount)
-            @turn += 1
-        end
+        raise "Bet too low." if amount + @bets[player] < current_bet
+        @pot += amount
+        @bets[player] += amount
+        player.debit(amount)
         @bet_this_round[player] = true
-        @turn = @turn % @players.length
-        return all_matched_or_folded
+        increment_turn
+        increment_stage if all_matched_or_folded
     end
 
     def fold(player)
+        raise "Play out of turn." if player_to_bet != player
         @folded[player] = true
-        @players.delete(player)
-        end_round if @players.length == 1
+        increment_turn
+        increment_stage if all_matched_or_folded
+        end_round if @folded.select{ |player, folded| !folded }.length == 1
+    end
+
+    def increment_turn
+        @turn += 1
+        @turn = @turn % @players.length
+        increment_turn if @folded[player_to_bet]
     end
 
     def positive_bet(player, amount)
-        raise "Bet too low." if amount + @bets[player] < current_bet
         @pot += amount
         @bets[player] += amount
         player.debit(amount)
@@ -96,9 +101,9 @@ class Round
             matched = @bets[player] == current_bet
             folded = @folded[player]
             bet_this_round = @bet_this_round[player]
-            return false if !(matched || folded) || !bet_this_round
+            return false if !(matched && bet_this_round) && !folded
         end
-        return increment_stage    
+        return true
     end
 
     def increment_stage
@@ -145,7 +150,7 @@ class Round
         @folded
     end
 
-    def bets(player)
+    def bet_so_far(player)
         @bet_this_round[player] ? @bets[player] : false
     end
 
@@ -165,7 +170,7 @@ class Round
                 cards: hand.cards.map{ |card| 
                     player.name == player_name ? card.json : Card.blank_json
                 },
-                bet: bets(player)
+                bet: bet_so_far(player)
             }},
             winner: get_winner_name
             }.to_json

@@ -139,7 +139,7 @@ describe Round do
         it "can handle folds" do
             round = Round.new(@players, @deck)
             round.bet(@player1, 100)
-            round.bet(@player2, -1)
+            round.fold(@player2)
             round.bet(@player3, 100)
             round.bet(@player4, 150)
             round.bet(@player1, 50)

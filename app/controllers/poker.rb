@@ -27,6 +27,7 @@ class Poker < Sinatra::Base
         token = request.env["HTTP_AUTHORIZATION"].split(' ').last
         decoded_token = JWT.decode(token, nil, false)
         player = Game.get_player(decoded_token[0]["player_name"])
+        puts(player)
         Game.round.fold(player)
         201
     end

@@ -21,7 +21,7 @@ describe "Feature tests" do
             # puts "Community:"
             # for card in round.community_cards do puts card.print end
             round.bet(player1, 50)
-            round.bet(player2, -1)
+            round.fold(player2)
             round.bet(player3, 100)
             round.bet(player4, 100)
             round.bet(player1, 50)
@@ -40,7 +40,7 @@ describe "Feature tests" do
             # for card in round.community_cards do puts card.print end
             round.bet(player1, 200)
             round.bet(player3, 200)
-            round.bet(player4, -1)
+            round.fold(player4)
             # puts "Pot: " + round.pot.to_s
             expect(round.pot).to eq 1100
 
@@ -48,6 +48,8 @@ describe "Feature tests" do
             # puts round.get_winner.print
             # puts "Players:"
             # for player in players do puts player.print end
+            
+
             expect(round.get_winner).to eq player1
             expect(player1.stack).to eq 1700
             expect(player2.stack).to eq 900
