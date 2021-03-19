@@ -77,7 +77,7 @@ class Round
     end
 
     def player_to_bet
-        false if !!get_winner
+        return false if !!get_winner
         @players[turn]
     end
 
@@ -137,6 +137,10 @@ class Round
         @folded
     end
 
+    def bets(player)
+        @bet_this_round[player] ? @bets[player] : false
+    end
+
     def json(player_name)
         { 
             round: true,
@@ -148,7 +152,8 @@ class Round
                 player: player.json, 
                 cards: hand.cards.map{ |card| 
                     player.name == player_name ? card.json : Card.blank_json
-                }
+                },
+                bet: bets(player)
             }},
             winner: get_winner_name
             }.to_json

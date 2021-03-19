@@ -37,8 +37,8 @@ class Card
 
     def self.blank_json
         {
-            suit: 'X',
-            value: 'X'
+            suit: '',
+            value: ''
         }
     end
 end
