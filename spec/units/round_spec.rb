@@ -65,7 +65,7 @@ describe Round do
             round.deal_community
 
             allow(round).to receive(:hands).and_return(hands)
-            allow(round).to receive(:stage).and_return(4)
+            allow(round).to receive(:completed).and_return(true)
 
             expect(round.get_winner).to eq @player2
         end
@@ -84,7 +84,7 @@ describe Round do
 
             allow(round).to receive(:hands).and_return(hands)
             allow(round).to receive(:folded).and_return(folded)
-            allow(round).to receive(:stage).and_return(4)
+            allow(round).to receive(:completed).and_return(true)
 
             expect(round.get_winner).to eq @player3
         end
@@ -223,6 +223,16 @@ describe Round do
             allow(round).to receive(:get_winner).and_return(@player1)
             expect(@player1).to receive(:deposit).with(100)
             round.allocate_winnings
+        end
+    end
+    describe "#fold" do
+        it "Ends the round if only one player left" do
+            round = Round.new(@players, @deck)
+            round.fold(@player1)
+            round.fold(@player2)
+            expect(round).to receive(:allocate_winnings)
+            round.fold(@player3)
+            expect(round.completed).to eq true
         end
     end
 end

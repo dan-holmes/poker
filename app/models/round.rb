@@ -14,6 +14,7 @@ class Round
         @folded = Hash[players.collect { |player| [player, false] }]
         @bet_this_round = Hash[players.collect { |player| [player, false] }]
         @stage = 0
+        @completed = false
         deal_hands(hand_class)
     end
 
@@ -32,7 +33,7 @@ class Round
     end
 
     def get_winner
-        return false if stage < 4
+        return false if !completed
         winning_player = @players.first
         winning_score = hands[winning_player].score(community_cards)
         for player in @players do
@@ -67,6 +68,7 @@ class Round
     def fold(player)
         @folded[player] = true
         @players.delete(player)
+        end_round if @players.length == 1
     end
 
     def positive_bet(player, amount)
@@ -109,11 +111,17 @@ class Round
         when 3
             deal_community
         when 4
+            @completed = true
             allocate_winnings
         end
         @turn = 0
         @bets = Hash[@players.collect { |player| [player, 0] }]
         @bet_this_round = Hash[@players.collect { |player| [player, false] }]
+    end
+
+    def end_round
+        @completed = true
+        allocate_winnings
     end
 
     def allocate_winnings
@@ -139,6 +147,10 @@ class Round
 
     def bets(player)
         @bet_this_round[player] ? @bets[player] : false
+    end
+
+    def completed
+        @completed
     end
 
     def json(player_name)
