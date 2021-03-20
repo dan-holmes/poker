@@ -11,6 +11,11 @@ class Game
 
     def self.new_round
         @round = Round.new(@players, @deck)
+        self.move_dealer
+    end
+
+    def self.move_dealer
+        @players = @players[1..-1].push(@players[0]) if @players.length > 1
     end
 
     def self.round
