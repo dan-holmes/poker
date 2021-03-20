@@ -97,90 +97,88 @@ describe Round do
     describe " #bet" do
         it "increases the pot" do
             round = Round.new(@players, @deck)
-            expect {round.bet(@player1, 100)}.to change{ round.pot }.by(100)
+            expect {round.bet(@player3, 100)}.to change{ round.pot }.by(100)
         end
         it "debits the amount from the player's stack" do
-            round = Round.new([@player1, double(:player)], @deck)
-            expect(@player1).to receive(:debit).with(100)
-            round.bet(@player1, 100)
+            round = Round.new(@players, @deck)
+            expect(@player3).to receive(:debit).with(100)
+            round.bet(@player3, 100)
         end
         it "increases the current bet to that amount" do
             round = Round.new(@players, @deck)
-            round.bet(@player1, 100)
+            round.bet(@player3, 100)
             expect(round.current_bet).to eq 100
         end
         it "errors if bet is too low" do
             round = Round.new(@players, @deck)
-            round.bet(@player1, 100)
-            expect{ round.bet(@player2, 50) }.to raise_error "Bet too low."
+            round.bet(@player3, 100)
+            expect{ round.bet(@player4, 50) }.to raise_error "Bet too low."
         end
         it "moves onto the next turn" do
             round = Round.new(@players, @deck)
-            expect{round.bet(@player1, 100)}.to change{ round.turn }.by(1)
+            expect{round.bet(@player3, 100)}.to change{ round.turn }.by(1)
         end
         it "errors if not your turn" do
             round = Round.new(@players, @deck)
-            round.bet(@player1, 100)
-            expect{ round.bet(@player1, 100) }.to raise_error "Play out of turn."
+            round.bet(@player3, 100)
             expect{ round.bet(@player3, 100) }.to raise_error "Play out of turn."
+            expect{ round.bet(@player1, 100) }.to raise_error "Play out of turn."
         end
         it "allows multiple bets in turn" do
             round = Round.new(@players, @deck)
-            round.bet(@player1, 100)
-            expect{ round.bet(@player2, 100) }.to_not raise_error
+            round.bet(@player3, 100)
+            expect{ round.bet(@player4, 100) }.to_not raise_error
         end
         it "moves turn to first player if last player bets" do
             round = Round.new(@players, @deck)
-            round.bet(@player1, 100)
-            round.bet(@player2, 100)
             round.bet(@player3, 100)
-            expect{ round.bet(@player4, 100) }.to change{ round.turn }.from(3).to(0)
+            expect{ round.bet(@player4, 100) }.to change{ round.turn }.from(3).to(0)            
         end
         it "can handle folds" do
             round = Round.new(@players, @deck)
-            round.bet(@player1, 100)
-            round.fold(@player2)
             round.bet(@player3, 100)
-            round.bet(@player4, 150)
-            round.bet(@player1, 50)
-            expect(round).to receive(:increment_stage)
+            round.fold(@player4)
+            round.bet(@player1, 90)
+            round.bet(@player2, 130)
             round.bet(@player3, 50)
-        end
-        it "moves to the next round if all matched or folded" do
-            round = Round.new(@players, @deck)
-            round.bet(@player1, 100)
-            round.bet(@player2, 100)
-            round.bet(@player3, 100)
             expect(round).to receive(:increment_stage)
-            round.bet(@player4, 100)
+            round.bet(@player1, 50)
+        end
+        it "moves to the next round if all matched or folded, including the big blind" do
+            round = Round.new(@players, @deck)
+            round.bet(@player3, 20)
+            round.bet(@player4, 20)
+            round.bet(@player1, 10)
+            expect(round).to receive(:increment_stage)
+            round.bet(@player2, 0)
         end
     end
     describe " #all_matched_or_folded" do
         it "Increments stage if all players have matched first bet" do
             round = Round.new(@players, @deck)
-            round.bet(@player1, 100)
-            round.bet(@player2, 100)
             round.bet(@player3, 100)
-            expect(round).to receive(:increment_stage)
             round.bet(@player4, 100)
+            round.bet(@player1, 90)
+            expect(round).to receive(:increment_stage)
+            round.bet(@player2, 80)
         end
         it "Doesn't increment stage if somebody has raised and not all have matched" do
             round = Round.new(@players, @deck)
-            round.bet(@player1, 100)
-            round.bet(@player2, 100)
-            round.bet(@player3, 150)
+            round.bet(@player3, 100)
+            round.bet(@player4, 100)
+            round.bet(@player1, 140)
             expect(round).not_to receive(:increment_stage)
-            round.bet(@player4, 150)
+            round.bet(@player2, 130)
         end
         it "Increments stage if one player has raised and all have matched" do
             round = Round.new(@players, @deck)
-            round.bet(@player1, 100)
-            round.bet(@player2, 100)
-            round.bet(@player3, 150)
-            round.bet(@player4, 150)
-            round.bet(@player1, 50)
+            round.bet(@player3, 100)
+            round.bet(@player4, 100)
+            round.bet(@player1, 140)
+            round.bet(@player2, 130)
+            round.bet(@player3, 50)
             expect(round).to receive(:increment_stage)
-            round.bet(@player2, 50)
+            round.bet(@player4, 50)
         end
     end
     describe " #increment_stage" do
@@ -197,13 +195,13 @@ describe Round do
         end
         it "resets the turn" do
             round = Round.new(@players, @deck)
-            round.bet(@player1, 100)
+            round.bet(@player3, 100)
             round.increment_stage
             expect{round.bet(@player1, 100)}.not_to raise_error
         end
         it "resets the current bet" do
             round = Round.new(@players, @deck)
-            round.bet(@player1, 100)
+            round.bet(@player3, 100)
             round.increment_stage
             expect{round.bet(@player1, 50)}.not_to raise_error
         end
@@ -228,19 +226,19 @@ describe Round do
     describe "#fold" do
         it "Ends the round if only one player left" do
             round = Round.new(@players, @deck)
-            round.fold(@player1)
-            round.fold(@player2)
-            expect(round).to receive(:allocate_winnings)
             round.fold(@player3)
+            round.fold(@player4)
+            expect(round).to receive(:allocate_winnings)
+            round.fold(@player1)
             expect(round.completed).to eq true
         end
         it "Stops that player getting another turn" do
             round = Round.new(@players, @deck)
-            round.fold(@player1)
-            round.bet(@player2, 10)
-            round.bet(@player3, 10)
-            round.bet(@player4, 10)
-            expect(round.player_to_bet).to eq @player2
+            round.fold(@player3)
+            round.bet(@player4, 20)
+            round.bet(@player1, 40)
+            round.bet(@player2, 30)
+            expect(round.player_to_bet).to eq @player4
         end
     end
 end

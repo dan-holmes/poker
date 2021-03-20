@@ -11,10 +11,10 @@ describe "Feature tests" do
 
             # puts "Hands:"
             # for player, hand in round.hands do puts player.name + " " + hand.print end
-            round.bet(player1, 100)
-            round.bet(player2, 100)
             round.bet(player3, 100)
             round.bet(player4, 100)
+            round.bet(player1, 90)
+            round.bet(player2, 80)
             # puts "Pot: " + round.pot.to_s
             expect(round.pot).to eq 400
 
