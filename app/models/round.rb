@@ -139,6 +139,11 @@ class Round
         return '...'
     end
 
+    def min_raise
+        @small_blind
+        # This could be changed to match official rules
+    end
+
     def end_round
         @completed = true
         allocate_winnings
@@ -179,6 +184,7 @@ class Round
             pot: @pot,
             current_bet: current_bet,
             player_to_bet: player_to_bet_name,
+            min_raise: min_raise,
             community_cards: @community_cards.map{ |card| card.json },
             hands: @hands.map{ |player, hand| {
                 player: player.json, 

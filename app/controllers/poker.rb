@@ -46,7 +46,8 @@ class Poker < Sinatra::Base
                 Game.players.map{ |player|
                     {
                         player: player.json,
-                        cards: []
+                        cards: [],
+                        status: 'Not playing'
                     }
                 },
             winner: false
