@@ -129,12 +129,12 @@ class Round
     end
 
     def status(player)
+        return 'Winner! +' + @pot.to_s if @completed && get_winner_name == player.name
         return 'Folded' if @folded[player]
+        return 'Loser' if @completed && get_winner_name != player.name
         return 'Small blind' if @bets[player] == @small_blind && !@bet_this_round[player]
         return 'Big blind' if @bets[player] == @small_blind * 2 && !@bet_this_round[player]
         return 'Check' if @bets[player] == 0 && @bet_this_round[player]
-        return 'Winner! +' + @pot.to_s if @completed && get_winner_name == player.name
-        return 'Loser' if @completed && get_winner_name != player.name
         return 'Bet ' + bet_so_far(player).to_s if @bet_this_round[player]
         return '...'
     end

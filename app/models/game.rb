@@ -9,6 +9,14 @@ class Game
         @players.push(Player.new(name, 1000))
     end
 
+    def self.remove_player(player)
+        puts 'removing'
+        puts(@players)
+        @players.delete(player)
+        puts 'removed'
+        puts(@players)
+    end
+
     def self.new_round
         @round = Round.new(@players, @deck)
         self.move_dealer

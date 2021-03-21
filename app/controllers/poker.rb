@@ -23,6 +23,15 @@ class Poker < Sinatra::Base
         { token: token(name) }.to_json
     end
 
+    post '/leave' do
+        token = request.env["HTTP_AUTHORIZATION"].split(' ').last
+        decoded_token = JWT.decode(token, nil, false)
+        player = Game.get_player(decoded_token[0]["player_name"])
+        Game.round.fold(player) if !Game.round.completed
+        Game.remove_player(player)
+        200
+    end
+
     post '/folds' do
         token = request.env["HTTP_AUTHORIZATION"].split(' ').last
         decoded_token = JWT.decode(token, nil, false)
