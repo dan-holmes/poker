@@ -15,6 +15,7 @@ class Round
         @bet_this_round = Hash[players.collect { |player| [player, false] }]
         @stage = 0
         @completed = false
+        @winner = nil
         @small_blind = small_blind
         deal_hands(hand_class)
         addBlinds
@@ -54,7 +55,7 @@ class Round
     end
 
     def get_winner_name
-        !!get_winner ? get_winner.name : false
+        !!@get_winner ? @get_winner.name : false
     end
 
     def unfolded_players
@@ -150,8 +151,8 @@ class Round
     end
 
     def allocate_winnings
-        winner = get_winner
-        winner.deposit(pot)
+        @winner = get_winner
+        @winner.deposit(pot)
     end
 
     def hands
