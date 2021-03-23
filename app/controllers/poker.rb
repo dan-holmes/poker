@@ -73,8 +73,13 @@ class Poker < Sinatra::Base
         decoded_token = JWT.decode(token, nil, false)
         player = Game.get_player(decoded_token[0]["player_name"])
         amount = params[:amount].to_i
-        Game.round.bet(player, amount)
-        201
+        begin
+            Game.round.bet(player, amount)
+        rescue => error
+            status 400
+        else
+            status 201
+        end
     end
 
     def token(player_name)

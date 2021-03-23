@@ -1,9 +1,9 @@
 describe Round do
     before(:each) do
-        @player1 = double(:player, debit: nil, deposit: nil, name: 'Alice')
-        @player2 = double(:player, debit: nil, deposit: nil, name: 'Bob')
-        @player3 = double(:player, debit: nil, deposit: nil, name: 'Charlie')
-        @player4 = double(:player, debit: nil, deposit: nil, name: 'Dan')
+        @player1 = double(:player, debit: nil, deposit: nil, name: 'Alice', stack: 1000)
+        @player2 = double(:player, debit: nil, deposit: nil, name: 'Bob', stack: 1000)
+        @player3 = double(:player, debit: nil, deposit: nil, name: 'Charlie', stack: 1000)
+        @player4 = double(:player, debit: nil, deposit: nil, name: 'Dan', stack: 1000)
         @players = [@player1, @player2, @player3, @player4]
         @deck = double(:deck, {reset: nil, shuffle: nil, deal_card: double(:card, value: 10, suit: 'Hearts')})
     end
@@ -123,6 +123,10 @@ describe Round do
             round.bet(@player3, 100)
             expect{ round.bet(@player3, 100) }.to raise_error "Play out of turn."
             expect{ round.bet(@player1, 100) }.to raise_error "Play out of turn."
+        end
+        it "errors if you can't afford the bet" do
+            round = Round.new(@players, @deck)
+            expect{ round.bet(@player3, 2000) }.to raise_error "Not enough chips."
         end
         it "allows multiple bets in turn" do
             round = Round.new(@players, @deck)

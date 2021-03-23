@@ -66,6 +66,7 @@ class Round
     def bet(player, amount, blind = false)
         raise "Play out of turn." if player_to_bet != player
         raise "Bet too low." if amount + @bets[player] < current_bet
+        raise "Not enough chips." if amount > player.stack
         @bet_leader = player if amount > current_bet
         @pot += amount
         @bets[player] += amount
