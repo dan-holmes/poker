@@ -29,6 +29,7 @@ class Poker < Sinatra::Base
         player = Game.get_player(decoded_token[0]["player_name"])
         Game.round.fold(player) if !Game.round.completed
         Game.remove_player(player)
+        Game.clear_round if Game.players.empty?
         200
     end
 

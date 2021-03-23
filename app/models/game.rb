@@ -26,6 +26,10 @@ class Game
         @players = @players[1..-1].push(@players[0]) if @players.length > 1
     end
 
+    def self.clear_round
+        @round = nil
+    end
+
     def self.round
         @round
     end
