@@ -4,7 +4,7 @@ The back end for a Poker app. Written using Ruby with Sinatra.
 
 The front end for the same app can be found [here](https://github.com/dan-holmes/poker-frontend).
 
-A live version off the app can be found [here](https://poker-frontend.vercel.app/).
+A live version off the app can be found [here](https://dh-poker.vercel.app/).
 
 ![Screenshot](https://i.imgur.com/m6rb1ms.png)
 
@@ -33,7 +33,7 @@ Then visit ``http://localhost:3000``
 
 # Testing
 
-This app is unit tested on the backend. To run the tests run ``rspec`` in the backend folder.
+This app is unit tested on the back end. To run the tests run ``rspec`` in the backend folder.
 
 # Missing features
 
