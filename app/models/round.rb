@@ -11,6 +11,7 @@ class Round
         @community_cards = []
         @turn = 0
         @bets = Hash[players.collect { |player| [player, 0] }]
+        @bet_leader = players.first
         @folded = Hash[players.collect { |player| [player, false] }]
         @bet_this_round = Hash[players.collect { |player| [player, false] }]
         @stage = 0
@@ -55,7 +56,7 @@ class Round
     end
 
     def get_winner_name
-        !!@get_winner ? @get_winner.name : false
+        !!winner ? winner.name : false
     end
 
     def unfolded_players
@@ -65,6 +66,7 @@ class Round
     def bet(player, amount, blind = false)
         raise "Play out of turn." if player_to_bet != player
         raise "Bet too low." if amount + @bets[player] < current_bet
+        @bet_leader = player if amount > current_bet
         @pot += amount
         @bets[player] += amount
         player.debit(amount)
@@ -115,10 +117,13 @@ class Round
         case @stage
         when 1
             deal_flop
+            @bet_leader = @players.first
         when 2
             deal_community
+            @bet_leader = @players.first
         when 3
             deal_community
+            @bet_leader = @players.first
         when 4
             @completed = true
             allocate_winnings
@@ -155,6 +160,19 @@ class Round
         @winner.deposit(pot)
     end
 
+    def show_hand(player)
+        return false if !completed
+        return false if folded[player]
+        player_to_check = @bet_leader
+        index = unfolded_players.find_index(player_to_check)
+        while (player_to_check != player) do
+            return false if hands[player_to_check].score(@community_cards) > hands[player].score(@community_cards)
+            index = (index + 1) % unfolded_players.length
+            player_to_check = unfolded_players[index]
+        end
+        return true
+    end
+
     def hands
         @hands
     end
@@ -179,6 +197,10 @@ class Round
         @completed
     end
 
+    def winner
+        @winner
+    end
+
     def json(player_name)
         { 
             round: true,
@@ -190,7 +212,7 @@ class Round
             hands: @hands.map{ |player, hand| {
                 player: player.json, 
                 cards: hand.cards.map{ |card| 
-                    player.name == player_name ? card.json : Card.blank_json
+                    player.name == player_name || show_hand(player) ? card.json : Card.blank_json
                 },
                 status: status(player),
                 bet_so_far: @bets[player]

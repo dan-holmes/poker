@@ -1,9 +1,9 @@
 describe Round do
     before(:each) do
-        @player1 = double(:player, debit: nil, deposit: nil)
-        @player2 = double(:player, debit: nil, deposit: nil)
-        @player3 = double(:player, debit: nil, deposit: nil)
-        @player4 = double(:player, debit: nil, deposit: nil)
+        @player1 = double(:player, debit: nil, deposit: nil, name: 'Alice')
+        @player2 = double(:player, debit: nil, deposit: nil, name: 'Bob')
+        @player3 = double(:player, debit: nil, deposit: nil, name: 'Charlie')
+        @player4 = double(:player, debit: nil, deposit: nil, name: 'Dan')
         @players = [@player1, @player2, @player3, @player4]
         @deck = double(:deck, {reset: nil, shuffle: nil, deal_card: double(:card, value: 10, suit: 'Hearts')})
     end
@@ -240,5 +240,84 @@ describe Round do
             round.bet(@player2, 30)
             expect(round.player_to_bet).to eq @player4
         end
+    end
+    describe 'Hands to show' do
+        it "Shows the hand of the winner" do
+            round = Round.new(@players, @deck)
+            allow(round).to receive(:completed).and_return(true)
+            allow(round).to receive(:winner).and_return(@player2)
+            expect(round.show_hand(@player2)).to eq true
+        end
+        it "Does not show folded hands" do
+            round = Round.new(@players, @deck)
+            round.fold(@player3)
+            allow(round).to receive(:completed).and_return(true)
+            expect(round.show_hand(@player3)).to eq false
+        end
+        it "Shows no hands if the round is not completed" do
+            round = Round.new(@players, @deck)
+            allow(round).to receive(:completed).and_return(false)
+            expect(round.show_hand(@player1)).to eq false
+            expect(round.show_hand(@player2)).to eq false
+            expect(round.show_hand(@player3)).to eq false
+            expect(round.show_hand(@player4)).to eq false
+        end
+        context 'Final round of betting' do
+            before(:each) do
+                @hand1 = double(:hand)
+                @hand2 = double(:hand)
+                @hand3 = double(:hand)
+                @hand4 = double(:hand)
+                
+                @hands = {@player1 => @hand1, @player2 => @hand2, @player3 => @hand3, @player4 => @hand4}
+                @round = Round.new(@players, @deck)
+                allow(@round).to receive(:hands).and_return(@hands)
+                @round.bet(@player3, 20)
+                @round.bet(@player4, 20)
+                @round.bet(@player1, 10)
+                @round.bet(@player2, 0)
+    
+                @round.bet(@player1, 0)
+                @round.bet(@player2, 0)
+                @round.bet(@player3, 0)
+                @round.bet(@player4, 0)
+    
+                @round.bet(@player1, 0)
+                @round.bet(@player2, 0)
+                @round.bet(@player3, 0)
+                @round.bet(@player4, 0)
+
+                @round.bet(@player1, 0)
+                @round.bet(@player2, 0)
+                @round.bet(@player3, 50)
+                @round.bet(@player4, 50)
+                @round.bet(@player1, 50)
+                
+            end
+            it "Shows only the winner if they instigated the final bet" do
+                allow(@hand1).to receive(:score).and_return(15)
+                allow(@hand2).to receive(:score).and_return(10)
+                allow(@hand3).to receive(:score).and_return(20)
+                allow(@hand4).to receive(:score).and_return(5)
+                @round.bet(@player2, 50)
+
+                expect(@round.show_hand(@player1)).to eq false
+                expect(@round.show_hand(@player2)).to eq false
+                expect(@round.show_hand(@player3)).to eq true
+                expect(@round.show_hand(@player4)).to eq false
+            end
+            it "Shows anyone who has been paid to be seen and has a claim to the win" do
+                allow(@hand1).to receive(:score).and_return(15)
+                allow(@hand2).to receive(:score).and_return(20)
+                allow(@hand3).to receive(:score).and_return(10)
+                allow(@hand4).to receive(:score).and_return(5)
+                @round.bet(@player2, 50)
+
+                expect(@round.show_hand(@player1)).to eq true
+                expect(@round.show_hand(@player2)).to eq true
+                expect(@round.show_hand(@player3)).to eq true
+                expect(@round.show_hand(@player4)).to eq false
+            end
+    end
     end
 end
