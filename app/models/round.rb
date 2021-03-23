@@ -205,6 +205,7 @@ class Round
     def json(player_name)
         { 
             round: true,
+            completed: completed,
             pot: @pot,
             current_bet: current_bet,
             player_to_bet: player_to_bet_name,
