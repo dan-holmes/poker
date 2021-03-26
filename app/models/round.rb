@@ -1,5 +1,5 @@
 class Round
-    attr_reader :community_cards, :turn, :bets
+    attr_reader :community_cards, :turn, :bets, :bet_leader
 
     def initialize(players, deck, hand_class = Hand, small_blind = 10)
         @deck = deck
@@ -67,7 +67,7 @@ class Round
         raise "Play out of turn." if player_to_bet != player
         raise "Bet too low." if amount + @bets[player] < current_bet
         raise "Not enough chips." if amount > player.stack
-        @bet_leader = player if amount > current_bet
+        @bet_leader = player if amount > current_bet || @folded[@bet_leader]
         @pot += amount
         @bets[player] += amount
         player.debit(amount)
@@ -118,13 +118,13 @@ class Round
         case @stage
         when 1
             deal_flop
-            @bet_leader = @players.first
+            @bet_leader = unfolded_players.first
         when 2
             deal_community
-            @bet_leader = @players.first
+            @bet_leader = unfolded_players.first
         when 3
             deal_community
-            @bet_leader = @players.first
+            @bet_leader = unfolded_players.first
         when 4
             @completed = true
             allocate_winnings

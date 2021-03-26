@@ -266,6 +266,28 @@ describe Round do
             expect(round.show_hand(@player3)).to eq false
             expect(round.show_hand(@player4)).to eq false
         end
+        it "Can handle checks and folds" do
+            round = Round.new(@players, @deck)
+            round.bet(@player3, 20)
+            round.bet(@player4, 20)
+            round.bet(@player1, 10)
+            round.fold(@player2)
+
+            round.bet(@player1, 20)
+            round.bet(@player3, 20)
+            round.bet(@player4, 20)
+
+            round.bet(@player1, 0)
+            round.bet(@player3, 0)
+            round.bet(@player4, 0)
+
+            round.fold(@player1)
+            round.bet(@player3, 0)
+            round.bet(@player4, 0)
+
+            expect(round.show_hand(@player1)).to eq false
+            expect(round.show_hand(@player3)).to eq true
+        end
         context 'Final round of betting' do
             before(:each) do
                 @hand1 = double(:hand)
