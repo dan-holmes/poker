@@ -126,7 +126,7 @@ describe Round do
         end
         it "errors if you can't afford the bet" do
             round = Round.new(@players, @deck)
-            expect{ round.bet(@player3, 2000) }.to raise_error "Not enough chips."
+            expect{ round.bet(@player3, 2000) }.to raise_error "Bet too high."
         end
         it "allows multiple bets in turn" do
             round = Round.new(@players, @deck)
@@ -155,6 +155,13 @@ describe Round do
             round.bet(@player1, 10)
             expect(round).to receive(:increment_stage)
             round.bet(@player2, 0)
+        end
+        it "stops you betting more than an opponents stack" do
+            rich_player = double(:player, {stack: 2000, debit: nil})
+            poor_player = double(:player, {stack: 500, debit: nil})
+            round = Round.new([rich_player, poor_player], @deck)
+            puts(round.max_bet)
+            expect{ round.bet(rich_player, 1500) }.to raise_error "Bet too high."
         end
     end
     describe " #all_matched_or_folded" do

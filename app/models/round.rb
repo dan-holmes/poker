@@ -63,10 +63,14 @@ class Round
         folded.select{ |player, folded| !folded }.keys
     end
 
+    def max_bet
+        unfolded_players.map{ |player| player.stack }.min
+    end
+
     def bet(player, amount, blind = false)
         raise "Play out of turn." if player_to_bet != player
         raise "Bet too low." if amount + @bets[player] < current_bet
-        raise "Not enough chips." if amount > player.stack
+        raise "Bet too high." if amount > max_bet
         @bet_leader = player if amount > current_bet || @folded[@bet_leader]
         @pot += amount
         @bets[player] += amount
