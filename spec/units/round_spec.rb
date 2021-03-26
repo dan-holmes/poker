@@ -253,12 +253,6 @@ describe Round do
         end
     end
     describe 'Hands to show' do
-        it "Shows the hand of the winner" do
-            round = Round.new(@players, @deck)
-            allow(round).to receive(:completed).and_return(true)
-            allow(round).to receive(:winner).and_return(@player2)
-            expect(round.show_hand(@player2)).to eq true
-        end
         it "Does not show folded hands" do
             round = Round.new(@players, @deck)
             round.fold(@player3)
@@ -268,6 +262,17 @@ describe Round do
         it "Shows no hands if the round is not completed" do
             round = Round.new(@players, @deck)
             allow(round).to receive(:completed).and_return(false)
+            expect(round.show_hand(@player1)).to eq false
+            expect(round.show_hand(@player2)).to eq false
+            expect(round.show_hand(@player3)).to eq false
+            expect(round.show_hand(@player4)).to eq false
+        end
+        it "Shows no hands if all but one fold" do
+            round = Round.new(@players, @deck)
+            round.fold(@player3)
+            round.fold(@player4)
+            round.fold(@player1)
+            expect(round.completed).to eq true
             expect(round.show_hand(@player1)).to eq false
             expect(round.show_hand(@player2)).to eq false
             expect(round.show_hand(@player3)).to eq false

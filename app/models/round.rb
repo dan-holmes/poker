@@ -168,6 +168,7 @@ class Round
     def show_hand(player)
         return false if !completed
         return false if folded[player]
+        return false if unfolded_players.length == 1
         player_to_check = @bet_leader
         index = unfolded_players.find_index(player_to_check)
         while (player_to_check != player) do
